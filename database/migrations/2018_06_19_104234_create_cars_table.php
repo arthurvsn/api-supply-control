@@ -21,7 +21,7 @@ class CreateCarsTable extends Migration
             $table->string('manufacturer', 25)->nullable();
             $table->string('color', 20)->nullable();
             $table->date('year_manufacture')->nullable();
-            $table->integer('capacity')->nullable();
+            $table->integer('capacity')->nullable()->unsigned();
 
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');

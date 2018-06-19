@@ -15,7 +15,12 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 
+        'username',
+        'email',
+        'profile_picture',
+        'password', 
+        'user_type',
     ];
 
     /**
@@ -24,6 +29,24 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 
+        'updated_at',
+        'deleted_at'
     ];
+
+    /**
+     * 
+     */
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    /**
+     * 
+     */
+    public function phones()
+    {
+        return $this->hasMany(Phone::class);
+    }
 }
