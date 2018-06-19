@@ -4,8 +4,17 @@ use Closure;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use \App\Response\Response;
+
 class VerifyJWTToken
 {
+    private $response;
+
+    public function __construct() 
+    {
+        $this->response = new Response();
+    }
+
     /**
      * Handle an incoming request.
      *

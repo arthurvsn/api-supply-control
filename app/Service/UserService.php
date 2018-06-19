@@ -37,7 +37,6 @@ class UserService extends Service
                 'profile_picture'   => $request->get('profile_picture'),
                 'email'             => $request->get('email'),
                 'password'          => bcrypt($request->get('password')),
-                'user_type'         => $request->get('user_type'),
             ]);
         }
         catch(Exception $e)

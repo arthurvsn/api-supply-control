@@ -15,9 +15,21 @@ use Illuminate\Http\Request;
 
 Route::get('/', 'HomeController@index');
 
-Route::post('auth/register', 'UserController@store');
-Route::post('auth/login', 'UserController@login');
+Route::get('/user', 'UserController@index');
+Route::post('/register', 'UserController@store');
+Route::post('/login', 'UserController@login');
 
 Route::group(['middleware' => 'jwt.auth'], function () {
-    Route::get('user', 'UserController@ping');
+    
+    Route::get('/ping', 'UserController@ping');
+
+    Route::get('getAuthUser', 'UserController@getUserLogged');
+    
+    //routes of users
+    Route::resource('user', 'UserController', ['except' => [
+        'store', 'index'
+    ]]); 
+
+    //Routes of cars
+    Route::resource('car', 'CarController');
 });

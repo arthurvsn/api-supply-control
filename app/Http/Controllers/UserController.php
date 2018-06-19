@@ -19,7 +19,10 @@ class UserController extends Controller
     private $response;
     private $userService;
 
-    public function __construct(User $user) 
+    /**
+     * construct
+     */
+    public function __construct()
     {
         $this->user         = new User;
         $this->address      = new Address;
@@ -120,6 +123,7 @@ class UserController extends Controller
         try
         {
             \DB::beginTransaction();
+            
             $returnUser = $this->userService->createUser($request);
 
             $returnUser->address = $this->userService->createAddressUser($returnUser->id, $request);
