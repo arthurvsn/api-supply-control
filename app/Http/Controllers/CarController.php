@@ -34,9 +34,7 @@ class CarController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        //
-    }
+    {   }
 
     /**
      * Show the form for creating a new resource.
@@ -116,9 +114,7 @@ class CarController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        //
-    }
+    {   }
 
     /**
      * Update the specified resource in storage.
@@ -190,5 +186,40 @@ class CarController extends Controller
 
             return response()->json($this->response->toString(), 500);
         }
+    }
+
+    /**
+     * Get all car by id user
+     * @param $userID
+     * @return object $cars
+     */
+    public function getAllCarsByUser($userID)
+    {
+        try 
+        {
+            $cars = $this->car->getAllCarsByUser($userID);
+
+            if(!$cars)
+            {
+                $this->response->setType("N");
+                $this->response->setMessages("Cars not found");
+            }
+            else 
+            {
+                $this->response->setType("S");
+                $this->response->setMessages("Cars founded!");
+                $this->response->setDataSet("cars", $cars);
+            }
+            
+        }
+        catch (\Exception $e)
+        {
+            $this->response->setType("N");
+            $this->response->setMessages($e->getMessage());
+
+            return response()->json($this->response->toString(), 500);
+        }
+        
+        return response()->json($this->response->toString());
     }
 }

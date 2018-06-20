@@ -32,4 +32,5 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 
     //Routes of cars
     Route::resource('car', 'CarController');
+    Route::get('car/user/{userId}', 'CarController@getAllCarsByUser');
 });
