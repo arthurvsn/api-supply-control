@@ -4,7 +4,7 @@ namespace App\Service;
 use Illuminate\Http\Request;
 use App\Supply;
 
-class CarService extends Service
+class SupplyService extends Service
 {
     private $supply;
 
@@ -28,6 +28,7 @@ class CarService extends Service
             $returnSupply = $this->supply->create([
                 'liters' => $request->get('liters'),
                 'amount' => $request->get('amount'),
+                'fuel_price' => $request->get('fuel_price'),
                 'type' => $request->get('type'),
                 'date_supply' => $request->get('date_supply'),
                 'car_id' => $request->get('car_id'),

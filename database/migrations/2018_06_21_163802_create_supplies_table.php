@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSuplliesTable extends Migration
+class CreateSuppliesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateSuplliesTable extends Migration
      */
     public function up()
     {
-        Schema::create('supllies', function (Blueprint $table) {
+        Schema::create('supplies', function (Blueprint $table) {
             $table->increments('id');
 
             $table->decimal('liters', 5, 2);
@@ -37,6 +37,6 @@ class CreateSuplliesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('supllies');
+        Schema::dropIfExists('supplies');
     }
 }

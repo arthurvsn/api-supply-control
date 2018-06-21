@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
-use App\Suplly;
+use App\Supply;
 use \App\Service\SupplyService;
 use \App\Response\Response;
 
@@ -19,7 +19,7 @@ class SupplyController extends Controller
     {
         $this->supply = new Supply();
         $this->supplyService = new SupplyService();
-        $this->response = new Resnponse();
+        $this->response = new Response();
     }
 
     /**

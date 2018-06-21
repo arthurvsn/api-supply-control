@@ -4,12 +4,13 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Suplly extends Model
+class Supply extends Model
 {
     protected $fillable = [
         'liters',
         'amount',
         'type',
+        'fuel_price',
         'date_supply',
         'car_id',
     ];
