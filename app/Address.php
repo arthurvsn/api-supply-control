@@ -23,7 +23,8 @@ class Address extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class);
+        //return $this->hasMany('App\User');
+        return $this->belongsTo('App\User');
     }
     
     /**

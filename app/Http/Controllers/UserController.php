@@ -114,7 +114,6 @@ class UserController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
@@ -161,6 +160,7 @@ class UserController extends Controller
 
         if(!$user)
         {
+            
             $this->response->setType("N");
             $this->response->setMessages("User not found!");
             return response()->json($this->response->toString(), 404);
@@ -204,28 +204,45 @@ class UserController extends Controller
             {
                 $this->response->setType("N");
                 $this->response->setMessages("Record not found!");
-    
+                
                 return response()->json($this->response->toString(), 404);
             }
-    
+
+            /**
+             * Ainda é gambiarra, organizar isso
+             */
+            \DB::beginTransaction();            
             $user->fill([
                 $request->all(),
                 'password' => bcrypt($request->get('password')),
             ]);
             $user->save();
+            
+            $address = $request->get('addresses');
+            $phones = $request->get('phones');
+
+            $user->addresses()->update($address[0]);
+            $user->phones()->update($phones[0]);
+            /**
+             * Fim da Gambiarra
+             */
+            
             $this->response->setType("S");
             $this->response->setDataSet("user", $user);
-            $this->response->setMessages("User updated successfully !");
-    
-            return response()->json($this->response->toString());
+            $this->response->setMessages("User updated successfully !");    
+            
         }
         catch (\Exception $e)
         {
+            \DB::rollBack();
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
+
+        \DB::commit();
+        return response()->json($this->response->toString());
     }
 
     /**

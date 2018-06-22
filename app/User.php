@@ -33,19 +33,14 @@ class User extends Authenticatable
         'deleted_at'
     ];
 
-    /**
-     * 
-     */
     public function addresses()
     {
-        return $this->hasMany(Address::class);
+        //return $this->belongsTo('App\Address');
+        return $this->hasMany('App\Address');
     }
 
-    /**
-     * 
-     */
     public function phones()
     {
-        return $this->hasMany(Phone::class);
+        return $this->hasMany('App\Phone');
     }
 }
