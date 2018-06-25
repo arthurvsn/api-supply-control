@@ -255,6 +255,7 @@ class UserController extends Controller
     {
         try
         {
+            \DB::beginTransaction();
             $user = User::find($id);
 
             if(!$user) 
@@ -265,17 +266,25 @@ class UserController extends Controller
                 return response()->json($this->response->toString(), 404);
             }
 
+            $user->addresses()->delete();
+            $user->phones()->delete();
             $user->delete();
+
+            $this->response->setType("S");
+            $this->response->setMessages("User deleted");
 
         }
         catch (\Exception $e)
         {
+            \DB::rollBack();
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
             return response()->json($this->response->toString(), 500);
         }
-        
+
+        \DB::commit();
+        return response()->json($this->response->toString());
     }
 
     /**
