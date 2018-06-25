@@ -36,4 +36,5 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 
     //Routes of supply
     Route::resource('supply', 'SupplyController');
+    Route::get('supply/{dateStart}/{dateEnd}/{carID}', 'SupplyController@expensesMounth');
 });

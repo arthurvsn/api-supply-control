@@ -100,4 +100,32 @@ class SupplyController extends Controller
      */
     public function destroy($id)
     {   }
+
+    /**
+     * search and sum values expenses between dates of params
+     * @param date $dateStart
+     * @param date $dateEnd
+     * @param int $carID
+     * @return \Illuminate\Http\Response
+     */
+    public function expensesMounth($dateStart, $dateEnd, $carID)
+    {
+        try 
+        {
+            $valueExpense = $this->supply->getExpenses($dateStart, $dateEnd, $carID);
+
+            $this->response->setType("S");
+            $this->response->setMessages("Search sucess");
+            $this->response->setDataSet("supply", $valueExpense);
+    
+        }
+        catch (\Exception $e)
+        {
+            $this->response->setType("N");
+            $this->response->setMessages($e->getMessage());
+
+            return response()->json($this->response->toString());
+        }
+        return response()->json($this->response->toString());
+    }
 }
