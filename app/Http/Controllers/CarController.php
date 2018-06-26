@@ -75,7 +75,7 @@ class CarController extends Controller
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
 
         return response()->json($this->response->toString());
@@ -95,7 +95,7 @@ class CarController extends Controller
         {
             $this->response->setType("N");
             $this->response->setMessages("Car not found!");
-            return response()->json($this->response->toString(), 404);
+            return response()->json($this->response->toString());
         }
         else 
         {
@@ -134,7 +134,7 @@ class CarController extends Controller
                 $this->response->setType("N");
                 $this->response->setMessages("Record not found!");
     
-                return response()->json($this->response->toString(), 404);
+                return response()->json($this->response->toString());
             }
     
             $car->fill([
@@ -152,7 +152,7 @@ class CarController extends Controller
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
     }
 
@@ -173,7 +173,7 @@ class CarController extends Controller
                 $this->response->setType("N");
                 $this->response->setMessages("Record not found!");
 
-                return response()->json($this->response->toString(), 404);
+                return response()->json($this->response->toString());
             }
 
             $user->delete();
@@ -184,7 +184,7 @@ class CarController extends Controller
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
     }
 
@@ -217,7 +217,7 @@ class CarController extends Controller
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
         
         return response()->json($this->response->toString());

@@ -14,6 +14,7 @@ class Phone extends Model
     ];
 
     protected $hidden = [
+        'user_id',
         'updated_at',
         'deleted_at'
     ];

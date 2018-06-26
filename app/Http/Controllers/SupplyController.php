@@ -58,7 +58,7 @@ class SupplyController extends Controller
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
 
         return response()->json($this->response->toString());

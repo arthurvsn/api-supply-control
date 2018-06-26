@@ -53,7 +53,7 @@ class UserController extends Controller
         {
             $this->response->setType("N");
             $this->response->setMessages("Failed to create token");
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
         
         $user = JWTAuth::toUser($token);
@@ -63,7 +63,7 @@ class UserController extends Controller
         $this->response->setDataSet("token", $token);
         
         $this->response->setDataSet("user", $user);
-        return response()->json($this->response->toString(), 200);
+        return response()->json($this->response->toString());
     }
 
     /**
@@ -139,7 +139,7 @@ class UserController extends Controller
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
 
         \DB::commit();
@@ -155,20 +155,18 @@ class UserController extends Controller
     public function show($id)
     {
         $user = $this->user->find($id);
-        $address = $this->address->getAddressUser($id);
-        $phone = $this->phone->getPhoneUser($id);
 
         if(!$user)
         {
             
             $this->response->setType("N");
             $this->response->setMessages("User not found!");
-            return response()->json($this->response->toString(), 404);
+            return response()->json($this->response->toString());
         }
         else 
         {
-            $user->addresses = $address;
-            $user->phones = $phone;
+            $user->addresses = $user->addresses()->get();
+            $user->phones = $user->phones()->get();
             
             $this->response->setType("S");
             $this->response->setDataSet("user", $user);
@@ -205,7 +203,7 @@ class UserController extends Controller
                 $this->response->setType("N");
                 $this->response->setMessages("Record not found!");
                 
-                return response()->json($this->response->toString(), 404);
+                return response()->json($this->response->toString());
             }
 
             /**
@@ -263,7 +261,7 @@ class UserController extends Controller
                 $this->response->setType("N");
                 $this->response->setMessages("Record not found!");
 
-                return response()->json($this->response->toString(), 404);
+                return response()->json($this->response->toString());
             }
 
             $user->addresses()->delete();
@@ -280,7 +278,7 @@ class UserController extends Controller
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
 
         \DB::commit();
@@ -306,7 +304,7 @@ class UserController extends Controller
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
         
         return response()->json($this->response->toString());
