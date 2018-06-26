@@ -18,27 +18,16 @@ class Address extends Model
 
     protected $hidden = [
         'user_id',
+        'created_at',
         'updated_at',
         'deleted_at'
     ];
 
+    /**
+     * Table user relationship with addresses
+     */
     public function users()
     {
         return $this->belongsTo('App\User');
-    }
-    
-    /**
-     * Get information address o user
-     * @param int $userId
-     * @return object $address
-     */
-    public function getAddressUser($userId)
-    {
-        $address = DB::table('addresses')
-            ->select('street', 'city', 'state', 'zip_code','country')
-            ->where('user_id', '=', $userId)
-            ->get();
-        
-        return $address;
     }
 }

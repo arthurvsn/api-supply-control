@@ -18,22 +18,25 @@ class Car extends Model
     ];
 
     protected $hidden = [
+        'user_id',
+        'created_at',
         'updated_at',
         'deleted_at'
     ];
 
     /**
-     * Get all cars by user ID on database
-     * @param int $userID
-     * @return object $cars
+     * Table user relationship with cars
      */
-    public function getAllCarsByUser($userID)
+    public function users()
     {
-        $cars = DB::table('cars')
-            ->select('id', 'board', 'model', 'manufacturer', 'color', 'year_manufacture', 'capacity')
-            ->where('user_id', '=', $userID)
-            ->get();
+        return $this->belongsTo('App\User');
+    }
 
-        return $cars;
+    /**
+     * Table supplies relationship with car
+     */
+    public function supplies()
+    {
+        return $this->hasMany('App\Supply');
     }
 }

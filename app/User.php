@@ -33,13 +33,27 @@ class User extends Authenticatable
         'deleted_at'
     ];
 
+    /**
+     * Table addresses relationship with user
+     */
     public function addresses()
     {
         return $this->hasMany('App\Address');
     }
 
+    /**
+     * Table phones relationship with user
+     */
     public function phones()
     {
         return $this->hasMany('App\Phone');
+    }
+
+    /**
+     * Table cars relationship with user
+     */
+    public function cars()
+    {
+        return $this->hasMany('App\Car');
     }
 }

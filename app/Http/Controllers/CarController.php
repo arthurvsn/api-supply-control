@@ -167,25 +167,38 @@ class CarController extends Controller
         try
         {
             $car = Car::find($id);
-
-            if(!$user)
+            
+            if(!$car)
             {
                 $this->response->setType("N");
                 $this->response->setMessages("Record not found!");
-
+                
                 return response()->json($this->response->toString());
+            }
+            \DB::beginTransaction();
+            
+            foreach($car as $key => $value) 
+            {
+                $cars = $this->car->find($value->id);
+                $cars->supplies()->delete();
             }
 
             $user->delete();
+            $this->response->setType("S");
+            $this->response->setMessages("Car and your supplies has been deleted");
 
         }
         catch (\Exception $e)
         {
+            \DB::rollBack();
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
             return response()->json($this->response->toString());
         }
+
+        \DB::commit();
+        return response()->json($this->response->toString());
     }
 
     /**
@@ -197,7 +210,8 @@ class CarController extends Controller
     {
         try 
         {
-            $cars = $this->car->getAllCarsByUser($userID);
+            $user = $this->user->find($userID);
+            $cars = $user->cars()->get();
 
             if(!$cars)
             {
@@ -209,8 +223,7 @@ class CarController extends Controller
                 $this->response->setType("S");
                 $this->response->setMessages("Cars founded!");
                 $this->response->setDataSet("cars", $cars);
-            }
-            
+            }            
         }
         catch (\Exception $e)
         {

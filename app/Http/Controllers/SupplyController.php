@@ -17,9 +17,9 @@ class SupplyController extends Controller
      */
     public function __construct()
     {
-        $this->supply = new Supply();
-        $this->supplyService = new SupplyService();
-        $this->response = new Response();
+        $this->supply         = new Supply();
+        $this->supplyService  = new SupplyService();
+        $this->response       = new Response();
     }
 
     /**

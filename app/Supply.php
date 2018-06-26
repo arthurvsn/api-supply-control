@@ -17,9 +17,19 @@ class Supply extends Model
     ];
 
     protected $hidden = [
+        'car_id',
+        'created_at',
         'updated_at',
         'deleted_at'
     ];
+
+    /**
+     * Table cars relationship with supplies
+     */
+    public function cars()
+    {
+        return $this->belongsTo('App\Car');
+    }
 
     public function getExpenses($dateStart, $dateEnd, $carID)
     {

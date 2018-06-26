@@ -17,7 +17,7 @@ class CreateSuppliesTable extends Migration
             $table->increments('id');
 
             $table->decimal('liters', 5, 2);
-            $table->double('amount');
+            $table->decimal('amount', 5, 2);
             $table->double('fuel_price');
             $table->enum('type', ['ALCOHOL', 'GASOLINE', 'DIESEL', 'GAS'])->default('GASOLINE');
             $table->date('date_supply');

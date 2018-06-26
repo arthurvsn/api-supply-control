@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Address;
 use App\Phone;
+use App\Car;
+use App\Supply;
 use JWTAuth;
 use JWTAuthException;
 use \App\Response\Response;
@@ -16,6 +18,8 @@ class UserController extends Controller
     private $user;
     private $address;
     private $phone;
+    private $car;
+    private $supply;
     private $response;
     private $userService;
 
@@ -27,6 +31,8 @@ class UserController extends Controller
         $this->user         = new User;
         $this->address      = new Address;
         $this->phone        = new Phone;
+        $this->car          = new Car;
+        $this->supply       = new Supply;
         $this->response     = new Response();
         $this->userService  = new UserService();
     }
@@ -167,6 +173,18 @@ class UserController extends Controller
         {
             $user->addresses = $user->addresses()->get();
             $user->phones = $user->phones()->get();
+            $car = $user->cars()->get();
+
+            $objectCar = [];
+            foreach ($car as $key => $value) 
+            {                
+                $carValue = $this->car->find($value->id);
+                $supply = $carValue->supplies()->get();
+                $carValue->supply = $carValue->supplies()->get();
+                $objectCar[] = $carValue;
+            }
+
+            $user->cars = $objectCar;
             
             $this->response->setType("S");
             $this->response->setDataSet("user", $user);
@@ -264,12 +282,27 @@ class UserController extends Controller
                 return response()->json($this->response->toString());
             }
 
+            $car = $user->cars()->get();
+            
+            /**
+             * Delete all supply dependencies of a user's cars
+             */
+            foreach($car as $key => $value) 
+            {
+                $cars = $this->car->find($value->id);
+                $cars->supplies()->delete();
+            }
+            
+            /**
+             * Delete all dependencies of a user
+             */
+            $user->cars()->delete();
             $user->addresses()->delete();
             $user->phones()->delete();
             $user->delete();
 
             $this->response->setType("S");
-            $this->response->setMessages("User deleted");
+            $this->response->setMessages("User and your dependencies has been deleted");
 
         }
         catch (\Exception $e)
@@ -281,7 +314,8 @@ class UserController extends Controller
             return response()->json($this->response->toString());
         }
 
-        \DB::commit();
+        \DB::rollBack();
+        //\DB::commit();
         return response()->json($this->response->toString());
     }
 
