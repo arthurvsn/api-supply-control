@@ -314,8 +314,7 @@ class UserController extends Controller
             return response()->json($this->response->toString());
         }
 
-        \DB::rollBack();
-        //\DB::commit();
+        \DB::commit();
         return response()->json($this->response->toString());
     }
 

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCarsTable extends Migration
+class CreateAddressesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,19 @@ class CreateCarsTable extends Migration
      */
     public function up()
     {
-        Schema::create('cars', function (Blueprint $table) {
+        Schema::create('addresses', function (Blueprint $table) {
             $table->increments('id');
             
-            $table->char('board', 7)->nullable();
-            $table->string('model', 25)->nullable();
-            $table->string('manufacturer', 25)->nullable();
-            $table->string('color', 20)->nullable();
-            $table->date('year_manufacture')->nullable();
-            $table->integer('capacity')->nullable()->unsigned();
+            $table->string('street', 60)->nullable();
+            $table->string('city', 25)->nullable();
+            $table->string('state', 25)->nullable();
+            $table->string('zip_code')->nullable();
+            $table->string('country')->nullable();
+            $table->char('number')->nullable();
 
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
-            
+
             $table->timestamps();
             $table->softDeletes();
         });
@@ -38,6 +38,6 @@ class CreateCarsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cars');
+        Schema::dropIfExists('addresses');
     }
 }
