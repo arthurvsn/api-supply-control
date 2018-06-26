@@ -14,13 +14,14 @@ class Phone extends Model
     ];
 
     protected $hidden = [
+        'user_id',
         'updated_at',
         'deleted_at'
     ];
 
     public function users()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsTo('App\User');
     }
 
     /**

@@ -53,7 +53,7 @@ class UserController extends Controller
         {
             $this->response->setType("N");
             $this->response->setMessages("Failed to create token");
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
         
         $user = JWTAuth::toUser($token);
@@ -63,7 +63,7 @@ class UserController extends Controller
         $this->response->setDataSet("token", $token);
         
         $this->response->setDataSet("user", $user);
-        return response()->json($this->response->toString(), 200);
+        return response()->json($this->response->toString());
     }
 
     /**
@@ -114,7 +114,6 @@ class UserController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
@@ -140,7 +139,7 @@ class UserController extends Controller
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
 
         \DB::commit();
@@ -156,19 +155,18 @@ class UserController extends Controller
     public function show($id)
     {
         $user = $this->user->find($id);
-        $address = $this->address->getAddressUser($id);
-        $phone = $this->phone->getPhoneUser($id);
 
         if(!$user)
         {
+            
             $this->response->setType("N");
             $this->response->setMessages("User not found!");
-            return response()->json($this->response->toString(), 404);
+            return response()->json($this->response->toString());
         }
         else 
         {
-            $user->addresses = $address;
-            $user->phones = $phone;
+            $user->addresses = $user->addresses()->get();
+            $user->phones = $user->phones()->get();
             
             $this->response->setType("S");
             $this->response->setDataSet("user", $user);
@@ -204,28 +202,45 @@ class UserController extends Controller
             {
                 $this->response->setType("N");
                 $this->response->setMessages("Record not found!");
-    
-                return response()->json($this->response->toString(), 404);
+                
+                return response()->json($this->response->toString());
             }
-    
+
+            /**
+             * Ainda é gambiarra, organizar isso
+             */
+            \DB::beginTransaction();            
             $user->fill([
                 $request->all(),
                 'password' => bcrypt($request->get('password')),
             ]);
             $user->save();
+            
+            $address = $request->get('addresses');
+            $phones = $request->get('phones');
+
+            $user->addresses()->update($address[0]);
+            $user->phones()->update($phones[0]);
+            /**
+             * Fim da Gambiarra
+             */
+            
             $this->response->setType("S");
             $this->response->setDataSet("user", $user);
-            $this->response->setMessages("User updated successfully !");
-    
-            return response()->json($this->response->toString());
+            $this->response->setMessages("User updated successfully !");    
+            
         }
         catch (\Exception $e)
         {
+            \DB::rollBack();
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
+
+        \DB::commit();
+        return response()->json($this->response->toString());
     }
 
     /**
@@ -238,6 +253,7 @@ class UserController extends Controller
     {
         try
         {
+            \DB::beginTransaction();
             $user = User::find($id);
 
             if(!$user) 
@@ -245,20 +261,28 @@ class UserController extends Controller
                 $this->response->setType("N");
                 $this->response->setMessages("Record not found!");
 
-                return response()->json($this->response->toString(), 404);
+                return response()->json($this->response->toString());
             }
 
+            $user->addresses()->delete();
+            $user->phones()->delete();
             $user->delete();
+
+            $this->response->setType("S");
+            $this->response->setMessages("User deleted");
 
         }
         catch (\Exception $e)
         {
+            \DB::rollBack();
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
-        
+
+        \DB::commit();
+        return response()->json($this->response->toString());
     }
 
     /**
@@ -280,7 +304,7 @@ class UserController extends Controller
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
         
         return response()->json($this->response->toString());
