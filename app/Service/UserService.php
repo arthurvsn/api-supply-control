@@ -62,11 +62,12 @@ class UserService extends Service
             foreach ($request->get('addresses') as $key => $value)
             {
                 $returnAddressUser[] = $this->address->create([
+                    'zip_code'  => $value['zip_code'],
                     'street'    => $value['street'],
                     'city'      => $value['city'],
                     'state'     => $value['state'],
-                    'zip_code'  => $value['zip_code'],
                     'country'   => $value['country'],
+                    'number'    => $value['number'],
                     'user_id'   => $userId,
                 ]);
             }
