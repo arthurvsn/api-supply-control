@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use JWTAuth;
 use JWTAuthException;
 use Validator;
+use Mail;
 use App\User;
 use App\Address;
 use App\Phone;
@@ -23,6 +24,7 @@ class UserController extends Controller
     private $supply;
     private $response;
     private $userService;
+    private $teste;
 
     /**
      * construct
@@ -347,6 +349,14 @@ class UserController extends Controller
     }
 
     /**
+     * 
+     */
+    public function sentemail()
+    {
+        return response()->json(["response" => "Your email has been sent successfully"]);
+    }
+
+    /**
      * Get token from email to reset password
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -366,10 +376,22 @@ class UserController extends Controller
             }
 
             $userToken = JWTAuth::fromUser($user);
+            
+            $data = array(
+                'name' => $user->name,
+                'link' => "http://localhost:4200/recovery/".$userToken
+            );
 
-            $this->response->setDataSet("emailtoken", $userToken);
+            Mail::send('mail', $data, function ($message) {
+
+                $message->from('arthurvsn@gmail.com', 'SUPPLY CONTROL');
+
+                $message->to('arthurvsn@gmail.com')->subject('Password Recoverys');
+
+            });
+
             $this->response->setType("S");
-            $this->response->setMessages("OK");
+            $this->response->setMessages("Your email has been sent successfully");
 
         }
         catch (\Exception $e)
@@ -388,11 +410,12 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function resetPassword(Request $request)
+    public function resetPassword($token, Request $request)
     {
         try
         {
-            $token = JWTAuth::toUser($request->get('token')) != "" ? JWTAuth::toUser($request->get('token')) : $request->input('token');
+            //$token = JWTAuth::toUser($request->get('token')) == "" ? $token : JWTAuth::toUser($request->get('token')); //: $request->input('token');
+            $userToken = JWTAuth::toUser($token);
 
             if (!$token)
             {
@@ -402,13 +425,16 @@ class UserController extends Controller
                 return response()->json($this->response->toString());
             }
 
-            $user = $this->user->find($token->id);
+            $user = $this->user->find($userToken->id);
             
-            /* $newUser = $user->fill([
+            $newUser = $user->fill([
                 $request->all(),
                 'password' => bcrypt($request->get('password')),
             ]);
-            $user->save(); */
+            $user->save();
+            
+            //JWTAuth::setToken($token)->invalidate();
+            JWTAuth::invalidate($token);
 
             $this->response->setType("S");
             $this->response->setMessages("Change password sucefully");
@@ -424,6 +450,7 @@ class UserController extends Controller
         return response()->json($this->response->toString());
     }
 
+    //Não utilizaveis
     /**
      * Send reset link to user
      *

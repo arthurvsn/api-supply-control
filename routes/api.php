@@ -14,8 +14,10 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/', 'HomeController@index');
-Route::post('/resetpassword', 'UserController@teste');
-Route::post('teste', 'UserController@getTokenResetPassword');
+Route::post('password/reset', 'UserController@getTokenResetPassword');
+Route::post('password/change/{token}', 'UserController@resetPassword');
+
+Route::get('sentEmail', 'UserController@sentemail');
 
 Route::get('/user', 'UserController@index');
 Route::post('/register', 'UserController@store');

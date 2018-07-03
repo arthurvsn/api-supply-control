@@ -54,11 +54,12 @@ return [
     | used globally for all e-mails that are sent by your application.
     |
     */
+
     'from' => [
-        'address' => 'yourEmail@gmail.com', 
-        'name' => 'Your Title'
+        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+        'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | E-Mail Encryption Protocol
@@ -70,7 +71,7 @@ return [
     |
     */
 
-    'encryption' => 'tls',
+    'encryption' => env('MAIL_ENCRYPTION', 'tls'),
 
     /*
     |--------------------------------------------------------------------------
