@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/', 'HomeController@index');
+Route::post('/resetpassword', 'UserController@teste');
+Route::post('teste', 'UserController@getTokenResetPassword');
 
 Route::get('/user', 'UserController@index');
 Route::post('/register', 'UserController@store');
@@ -37,4 +39,5 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     //Routes of supply
     Route::resource('supply', 'SupplyController');
     Route::get('supply/{dateStart}/{dateEnd}/{carID}', 'SupplyController@expensesMounth');
+
 });
