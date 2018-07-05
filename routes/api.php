@@ -19,22 +19,38 @@ Route::get('/user', 'UserController@index');
 Route::post('/register', 'UserController@store');
 Route::post('/login', 'UserController@login');
 
+/**
+ * Routes of change password
+ */
+Route::post('password/change', 'UserController@getTokenResetPassword');
+Route::post('password/reset/{token}', 'UserController@resetPassword');
+
+/**
+ * Rotas que precisam estar autenticadas
+ */
 Route::group(['middleware' => 'jwt.auth'], function () {
     
     Route::get('/ping', 'UserController@ping');
 
     Route::get('getAuthUser', 'UserController@getUserLogged');
     
-    //routes of users
+    /**
+     * Routes of users
+     */
     Route::resource('user', 'UserController', ['except' => [
         'store', 'index'
     ]]); 
 
-    //Routes of cars
+    /**
+     * Routes of cars
+     */
     Route::resource('car', 'CarController');
     Route::get('car/user/{userId}', 'CarController@getAllCarsByUser');
 
-    //Routes of supply
+    /**
+     * Routes of supply
+     */
     Route::resource('supply', 'SupplyController');
     Route::get('supply/{dateStart}/{dateEnd}/{carID}', 'SupplyController@expensesMounth');
+
 });

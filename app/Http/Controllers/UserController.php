@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use JWTAuth;
+use JWTAuthException;
+use Validator;
+use Mail;
 use App\User;
 use App\Address;
 use App\Phone;
 use App\Car;
 use App\Supply;
-use JWTAuth;
-use JWTAuthException;
 use \App\Response\Response;
 use \App\Service\UserService;
 
@@ -22,6 +24,7 @@ class UserController extends Controller
     private $supply;
     private $response;
     private $userService;
+    private $teste;
 
     /**
      * construct
@@ -319,7 +322,9 @@ class UserController extends Controller
     }
 
     /**
-     * 
+     * Get user loogged
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
     public function getUserLogged(Request $resquest)
     {
@@ -341,5 +346,188 @@ class UserController extends Controller
         }
         
         return response()->json($this->response->toString());
+    }
+
+    /**
+     * Get token from email to reset password
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getTokenResetPassword(Request $request) 
+    {
+        try 
+        {
+            $user = $this->user->where('email', $request->get('email'))->first();
+
+            if (!$user)
+            {
+                $this->response->setType("N");
+                $this->response->setMessages("Email not found!");
+
+                return response()->json($this->response->toString());    
+            }
+
+            $userToken = JWTAuth::fromUser($user);
+            
+            $data = array(
+                'name' => $user->name,
+                'link' => "http://localhost:4200/password/reset/".$userToken
+            );
+
+            Mail::send('mail', $data, function ($message) {
+
+                $message->from('noreplay@supplycontrol.com', 'SUPPLY CONTROL');
+
+                $message->to('arthurvsn@gmail.com')->subject('Password Recoverys');
+
+            });
+
+            $this->response->setType("S");
+            $this->response->setMessages("Your email has been sent successfully");
+
+        }
+        catch (\Exception $e)
+        {
+            $this->response->setType("N");
+            $this->response->setMessages($e->getMessage());
+
+            return response()->json($this->response->toString());
+        }
+
+        return response()->json($this->response->toString());
+    }
+
+    /**
+     * Reset Password from token
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function resetPassword($token, Request $request)
+    {
+        try
+        {
+            //$token = JWTAuth::toUser($request->get('token')) == "" ? $token : JWTAuth::toUser($request->get('token')); //: $request->input('token');
+            $userToken = JWTAuth::toUser($token);
+
+            if (!$token)
+            {
+                $this->response->setType("N");
+                $this->response->setMessages("token invalid!");
+
+                return response()->json($this->response->toString());
+            }
+
+            $user = $this->user->find($userToken->id);
+            
+            $newUser = $user->fill([
+                $request->all(),
+                'password' => bcrypt($request->get('password')),
+            ]);
+            $user->save();
+            
+            //JWTAuth::setToken($token)->invalidate();
+            JWTAuth::invalidate($token);
+
+            $this->response->setType("S");
+            $this->response->setMessages("Change password sucefully");
+        }
+        catch (\Exception $e)
+        {
+            $this->response->setType("N");
+            $this->response->setMessages($e->getMessage());
+
+            return response()->json($this->response->toString());
+        }
+
+        return response()->json($this->response->toString());
+    }
+
+    //Não utilizaveis
+    /**
+     * Send reset link to user
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return void
+     */
+    public function postResetPassword(Request $request)
+    {
+        $validator = $this->validateReset($request);
+
+        $response = $this->broker()->sendResetLink($request->only('email'));
+
+        switch ($response) {
+            case Password::INVALID_USER:
+                throw new ResourceException(trans('errors.could_not_reset_password'), $validator->errors());
+        }
+    }
+
+    /**
+     * Reset the given user's password.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function postNewPassword(Request $request)
+    {
+        $tokens = Password::getRepository();
+        $emails = $tokens->getConnection()->table('password_resets')->get();
+        $email = null;
+        foreach ($emails as $row) {
+            if (Hash::check($request->get('token'), $row->token) === true) {
+                $email = $row->email;
+                break;
+            }
+        }
+
+        if (empty($email)) {
+            throw new ResourceException(trans('errors.could_not_set_new_password'));
+        }
+
+        $credentials = $request->only(
+            'password', 'password_confirmation', 'token'
+        );
+        $credentials['email'] = $email;
+
+        $validator = Validator::make($credentials, [
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:6',
+        ]);
+
+        if ($validator->fails()) {
+            throw new StoreResourceFailedException(trans('errors.could_not_set_new_password'), $validator->errors());
+        }
+
+        $response = $this->broker()->reset($credentials, function ($user, $password) {
+            $this->resetPassword($user, $password);
+        });
+
+        switch ($response) {
+            case Password::PASSWORD_RESET:
+                return;
+
+            default:
+                throw new ResourceException(trans('errors.could_not_set_new_password'));
+        }
+    }
+
+    /**
+     * Validate a password reset request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Validation\Validator
+     */
+    protected function validateReset(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            // TODO: add translation
+            throw new ResourceException('Could not send reset link.', $validator->errors());
+        }
+
+        return $validator;
     }
 }
