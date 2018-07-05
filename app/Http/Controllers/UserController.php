@@ -349,14 +349,6 @@ class UserController extends Controller
     }
 
     /**
-     * 
-     */
-    public function sentemail()
-    {
-        return response()->json(["response" => "Your email has been sent successfully"]);
-    }
-
-    /**
      * Get token from email to reset password
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -379,12 +371,12 @@ class UserController extends Controller
             
             $data = array(
                 'name' => $user->name,
-                'link' => "http://localhost:4200/recovery/".$userToken
+                'link' => "http://localhost:4200/password/reset/".$userToken
             );
 
             Mail::send('mail', $data, function ($message) {
 
-                $message->from('arthurvsn@gmail.com', 'SUPPLY CONTROL');
+                $message->from('noreplay@supplycontrol.com', 'SUPPLY CONTROL');
 
                 $message->to('arthurvsn@gmail.com')->subject('Password Recoverys');
 
