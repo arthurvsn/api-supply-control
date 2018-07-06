@@ -14,6 +14,7 @@ use App\Car;
 use App\Supply;
 use \App\Response\Response;
 use \App\Service\UserService;
+use \App\Service\CloudinaryService;
 
 class UserController extends Controller
 {
@@ -24,7 +25,7 @@ class UserController extends Controller
     private $supply;
     private $response;
     private $userService;
-    private $teste;
+    private $cloudinary;
 
     /**
      * construct
@@ -38,6 +39,7 @@ class UserController extends Controller
         $this->supply       = new Supply;
         $this->response     = new Response();
         $this->userService  = new UserService();
+        $this->cloudinary   = new CloudinaryService();
     }
 
     /**
@@ -132,7 +134,9 @@ class UserController extends Controller
         {
             \DB::beginTransaction();
             
-            $returnUser = $this->userService->createUser($request);
+            $picutre = $this->cloudinary->uploadFile($request);
+
+            $returnUser = $this->userService->createUser($request, $picutre['url']);
 
             $returnUser->address = $this->userService->createAddressUser($returnUser->id, $request);
             $returnUser->phone = $this->userService->createPhoneUser($returnUser->id, $request);
