@@ -34,6 +34,8 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 
     Route::get('getAuthUser', 'UserController@getUserLogged');
     
+    Route::post('user/update/picture/{userID}', 'UserController@saveProfilePicture');
+
     /**
      * Routes of users
      */
