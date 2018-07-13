@@ -14,6 +14,7 @@ use App\Car;
 use App\Supply;
 use \App\Response\Response;
 use \App\Service\UserService;
+use \App\Service\CloudinaryService;
 
 class UserController extends Controller
 {
@@ -24,7 +25,7 @@ class UserController extends Controller
     private $supply;
     private $response;
     private $userService;
-    private $teste;
+    private $cloudinary;
 
     /**
      * construct
@@ -38,6 +39,7 @@ class UserController extends Controller
         $this->supply       = new Supply;
         $this->response     = new Response();
         $this->userService  = new UserService();
+        $this->cloudinary   = new CloudinaryService();
     }
 
     /**
@@ -131,8 +133,8 @@ class UserController extends Controller
         try
         {
             \DB::beginTransaction();
-            
-            $returnUser = $this->userService->createUser($request);
+
+            $returnUser = $this->userService->createUser($request, $picutre['url']);
 
             $returnUser->address = $this->userService->createAddressUser($returnUser->id, $request);
             $returnUser->phone = $this->userService->createPhoneUser($returnUser->id, $request);
@@ -442,92 +444,46 @@ class UserController extends Controller
         return response()->json($this->response->toString());
     }
 
-    //Não utilizaveis
     /**
-     * Send reset link to user
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return void
-     */
-    public function postResetPassword(Request $request)
-    {
-        $validator = $this->validateReset($request);
-
-        $response = $this->broker()->sendResetLink($request->only('email'));
-
-        switch ($response) {
-            case Password::INVALID_USER:
-                throw new ResourceException(trans('errors.could_not_reset_password'), $validator->errors());
-        }
-    }
-
-    /**
-     * Reset the given user's password.
-     *
+     * SAve a profile picture to user 
+     * @param  int  $id
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function postNewPassword(Request $request)
+    public function saveProfilePicture($id, Request $request)
     {
-        $tokens = Password::getRepository();
-        $emails = $tokens->getConnection()->table('password_resets')->get();
-        $email = null;
-        foreach ($emails as $row) {
-            if (Hash::check($request->get('token'), $row->token) === true) {
-                $email = $row->email;
-                break;
+        try 
+        {
+            $picutre = $this->cloudinary->uploadFile($request);
+            $user = $this->user->find($id);
+
+            if (!$picutre || !$user)
+            {
+                $this->response->setType("N");
+                $this->response->setMessages("Error");
+
+                return response()->json($this->response->toString());
             }
+
+            $user->fill([
+                'profile_picture' => $picutre['url'],
+            ]);
+
+            $user->save();
+
+            $this->response->setType("S");
+            $this->response->setMessages("Picture updated");
+            $this->response->setDataSet("picture", $picutre);
         }
 
-        if (empty($email)) {
-            throw new ResourceException(trans('errors.could_not_set_new_password'));
+        catch (\Exception $e)
+        {
+            $this->response->setType("N");
+            $this->response->setMessages($e->getMessage());
+
+            return response()->json($this->response->toString());
         }
 
-        $credentials = $request->only(
-            'password', 'password_confirmation', 'token'
-        );
-        $credentials['email'] = $email;
-
-        $validator = Validator::make($credentials, [
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|confirmed|min:6',
-        ]);
-
-        if ($validator->fails()) {
-            throw new StoreResourceFailedException(trans('errors.could_not_set_new_password'), $validator->errors());
-        }
-
-        $response = $this->broker()->reset($credentials, function ($user, $password) {
-            $this->resetPassword($user, $password);
-        });
-
-        switch ($response) {
-            case Password::PASSWORD_RESET:
-                return;
-
-            default:
-                throw new ResourceException(trans('errors.could_not_set_new_password'));
-        }
-    }
-
-    /**
-     * Validate a password reset request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Validation\Validator
-     */
-    protected function validateReset(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-        ]);
-
-        if ($validator->fails()) {
-            // TODO: add translation
-            throw new ResourceException('Could not send reset link.', $validator->errors());
-        }
-
-        return $validator;
+        return response()->json($this->response->toString());       
     }
 }
