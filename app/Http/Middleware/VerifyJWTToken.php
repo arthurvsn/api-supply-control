@@ -43,15 +43,15 @@ class VerifyJWTToken
         {
             if($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) 
             {
-                return response()->json($this->response->toString(false, $this->messages['token']['expired']));
+                return response()->json($this->response->toString("N", $this->messages['token']['expired']));
             }
             else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) 
             {
-                return response()->json($this->response->toString(false, $this->messages['token']['invalid']));
+                return response()->json($this->response->toString("N", $this->messages['token']['invalid']));
             }
             else
             {
-                return response()->json($this->response->toString(false, $this->messages['token']['riquered']));
+                return response()->json($this->response->toString("N", $this->messages['token']['riquered']));
             }
         }
        return $next($request);
