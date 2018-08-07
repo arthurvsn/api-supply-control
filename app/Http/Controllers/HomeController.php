@@ -8,17 +8,16 @@ use \App\Response\Response;
 class HomeController extends Controller
 {
     private $response;
+    private $messages;
 
     public function __construct() 
     {
+        $this->messages = \Config::get('messages');
         $this->response = new Response();
     }
 
     public function index()
     {
-        $this->response->setMessages("API connected!");
-        $this->response->setType("S");
-
-        return response()->json($this->response->toString());
+        return response()->json($this->response->toString("S", $this->messages['api']['connect']));
     }
 }

@@ -13,9 +13,10 @@ use Illuminate\Http\Request;
 class CarController extends Controller
 {   
     private $car;
-    private $user;
     private $carService;
+    private $messages;
     private $response;
+    private $user;
 
     /**
      * Construct
@@ -23,9 +24,10 @@ class CarController extends Controller
     public function __construct()
     {
         $this->car         = new Car();
-        $this->user        = new User();
         $this->carService  = new CarService();
+        $this->messages    = \Config::get('messages');
         $this->response    = new Response();
+        $this->user        = new User();
     }
 
     /**
@@ -58,27 +60,18 @@ class CarController extends Controller
 
             if(!$userLogged)
             {
-                $this->response->setType('N');
-                $this->response->setMessage('User not authenticate');
-
-                return response()->json($this->response->toString());
+                return response()->json($this->response->toString("N", $this->messages['login']['unauthenticated']));
             }
 
             $returnCar = $this->carService->createCar($userLogged->id, $request);
 
-            $this->response->setType("S");
             $this->response->setDataSet("Car", $returnCar);            
-            $this->response->setMessages("Created car successfully!");
+            return response()->json($this->response->toString("S", $this->messages['car']['sucess']));
         }
         catch (\Exception $e)
         {
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString("N", $e->getMessage()));
         }
-
-        return response()->json($this->response->toString());
     }
 
     /**
@@ -93,17 +86,12 @@ class CarController extends Controller
 
         if(!$car)
         {
-            $this->response->setType("N");
-            $this->response->setMessages("Car not found!");
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString("N", $this->messages['error']));
         }
         else 
         {
-            $this->response->setType("S");
             $this->response->setDataSet("car", $car);
-            $this->response->setMessages("Show car successfully!");
-            
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString("S", $this->messages['car']['show']));
         }
     }
 
@@ -131,28 +119,22 @@ class CarController extends Controller
             
             if(!$car) 
             {
-                $this->response->setType("N");
-                $this->response->setMessages("Record not found!");
-    
-                return response()->json($this->response->toString());
+                return response()->json($this->response->toString("N", $this->messages['error']));
             }
     
             $car->fill([
                 $request->all(),
             ]);
+
             $car->save();
-            $this->response->setType("S");
+
             $this->response->setDataSet("car", $car);
-            $this->response->setMessages("User updated successfully !");
-    
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString("S", $this->messages['car']['save']));
+
         }
         catch (\Exception $e)
         {
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString("N", $e->getMessage()));
         }
     }
 
@@ -170,11 +152,9 @@ class CarController extends Controller
             
             if(!$car)
             {
-                $this->response->setType("N");
-                $this->response->setMessages("Record not found!");
-                
-                return response()->json($this->response->toString());
+                return response()->json($this->response->toString("N", $this->messages['error']));
             }
+
             \DB::beginTransaction();
             
             foreach($car as $key => $value) 
@@ -184,21 +164,16 @@ class CarController extends Controller
             }
 
             $user->delete();
-            $this->response->setType("S");
-            $this->response->setMessages("Car and your supplies has been deleted");
+            
+            \DB::commit();
+            return response()->json($this->response->toString("S", $this->messages['car']['delete']));
 
         }
         catch (\Exception $e)
         {
             \DB::rollBack();
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString("N", $e->getMessage()));
         }
-
-        \DB::commit();
-        return response()->json($this->response->toString());
     }
 
     /**
@@ -215,24 +190,17 @@ class CarController extends Controller
 
             if(!$cars)
             {
-                $this->response->setType("N");
-                $this->response->setMessages("Cars not found");
+                return response()->json($this->response->toString("N", $this->messages['error']));
             }
             else 
             {
-                $this->response->setType("S");
-                $this->response->setMessages("Cars founded!");
                 $this->response->setDataSet("cars", $cars);
+                return response()->json($this->response->toString("S", $this->messages['car']['show']));
             }            
         }
         catch (\Exception $e)
         {
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString("N", $e->getMessage()));
         }
-        
-        return response()->json($this->response->toString());
     }
 }

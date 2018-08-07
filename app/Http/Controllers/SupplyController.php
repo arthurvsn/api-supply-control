@@ -9,6 +9,7 @@ use \App\Response\Response;
 
 class SupplyController extends Controller
 {
+    private $messages;
     private $supply;
     private $supplyService;
     
@@ -17,6 +18,7 @@ class SupplyController extends Controller
      */
     public function __construct()
     {
+        $this->messages       = \Config::get('messages');
         $this->supply         = new Supply();
         $this->supplyService  = new SupplyService();
         $this->response       = new Response();
@@ -49,19 +51,14 @@ class SupplyController extends Controller
         try 
         {
             $supplies = $this->supplyService->createSupply($request);
-            $this->response->setType("S");
-            $this->response->setMessages("Supply created sucessufuly");
+
             $this->response->setDataSet('supply', $supplies);
+            return response()->json($this->response->toString("S", $this->messages['supply']['sucess']));
         }
         catch (\Exception $e)
         {
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString("N", $e->getMessage()));
         }
-
-        return response()->json($this->response->toString());
     }
 
     /**
@@ -114,18 +111,13 @@ class SupplyController extends Controller
         {
             $valueExpense = $this->supply->getExpenses($dateStart, $dateEnd, $carID);
 
-            $this->response->setType("S");
-            $this->response->setMessages("Search sucess");
             $this->response->setDataSet("supply", $valueExpense);
+            return response()->json($this->response->toString("S", $this->messages['supply']['search']));
     
         }
         catch (\Exception $e)
         {
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString("N", $e->getMessage()));
         }
-        return response()->json($this->response->toString());
     }
 }
