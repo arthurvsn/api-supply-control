@@ -61,8 +61,10 @@ class UserController extends Controller
            }
 
             $user = JWTAuth::toUser($token);
-        
+
+            $this->response->setDataSet("token", $token);
             $this->response->setDataSet("user", $user);
+
             return response()->json($this->response->toString("S", $this->messages['login']['sucess']));
         } 
         catch (JWTAuthException $e) 
@@ -93,17 +95,14 @@ class UserController extends Controller
 
         if(!$user_logged) 
         {
-            $this->response->setType("N");
-            $this->response->setMessages("Sucess!");
+            return response()->json($this->response->toString("N", $this->messages['error']));
         } 
         else 
         {
-            $this->response->setType("S");
-            $this->response->setMessages("User logged!");
             $this->response->setDataSet("user", $user_logged);
+            return response()->json($this->response->toString("S", $this->messages['login']['logged']));
         }
 
-        return response()->json($this->response->toString2());
     }
 
     /**
@@ -295,7 +294,7 @@ class UserController extends Controller
         {
             $user = $this->userService->getAuthUser($resquest);
 
-            return response()->json($this->response->toString("S", $this->messages['user']['show']));
+            return response()->json($this->response->toString("S", $this->messages['login']['logged']));
         }
         catch (\Exception $e)
         {
