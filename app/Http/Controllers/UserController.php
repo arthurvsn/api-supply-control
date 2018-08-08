@@ -80,11 +80,8 @@ class UserController extends Controller
     {
         $users = User::get();
         
-        $this->response->setType("S");
         $this->response->setDataSet("user", $users);
-        $this->response->setMessages("Sucess!");
-
-        return response()->json($this->response->toString());
+        return response()->json($this->response->toString("S", $this->messages['user']['show']));
     }
 
     /**
@@ -106,7 +103,7 @@ class UserController extends Controller
             $this->response->setDataSet("user", $user_logged);
         }
 
-        return response()->json($this->response->toString());
+        return response()->json($this->response->toString2());
     }
 
     /**
@@ -337,7 +334,7 @@ class UserController extends Controller
 
             });
 
-            return response()->json($this->response->toString("N", $this->messages['reset']['nomail']));
+            return response()->json($this->response->toString("N", $this->messages['reset']['sucess']));
 
         }
         catch (\Exception $e)

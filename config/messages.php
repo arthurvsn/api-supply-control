@@ -28,6 +28,7 @@ return [
         "credentials" => "Invalid username or password",
         "sucess" => "Login successfully!",
         "unauthenticated" => "User not authenticate",
+        "logged" => "User logged!",
     ],
 
     "reset" => [

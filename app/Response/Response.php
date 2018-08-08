@@ -72,7 +72,7 @@ class Response
      * Function to converte a object with options
      * @return object $data
      */
-    public function toString()
+    public function toString2()
     {   
         $data = [];    
         $data['message']['text'] = $this->getMessages();
@@ -94,7 +94,7 @@ class Response
      * Function to converte a object with options
      * @return object $data
      */
-    public function toString2($type, $message = "")
+    public function toString($type, $message = "")
     {
         $data = [];
 
