@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Supply;
+use App\TypeFuel;
 use \App\Service\SupplyService;
 use \App\Response\Response;
 
@@ -12,6 +13,7 @@ class SupplyController extends Controller
     private $messages;
     private $supply;
     private $supplyService;
+    private $typeFuel;
     
     /**
      * Construct
@@ -21,6 +23,7 @@ class SupplyController extends Controller
         $this->messages       = \Config::get('messages');
         $this->supply         = new Supply();
         $this->supplyService  = new SupplyService();
+        $this->typeFuel       = new TypeFuel();
         $this->response       = new Response();
     }
 
@@ -114,6 +117,26 @@ class SupplyController extends Controller
             $this->response->setDataSet("supply", $valueExpense);
             return response()->json($this->response->toString("S", $this->messages['supply']['search']));
     
+        }
+        catch (\Exception $e)
+        {
+            return response()->json($this->response->toString("N", $e->getMessage()));
+        }
+    }
+
+    /**
+     * Get type fuels on database
+     * @return \Illuminate\Http\Response
+     */
+    public function getTypeFuel()
+    {
+        try
+        {
+            $typeFuels = $this->typeFuel->get();
+
+            $this->response->setDataSet("typeFuels", $typeFuels);
+            return response()->json($this->response->toString("S", $this->messages['supply']['search']));
+
         }
         catch (\Exception $e)
         {

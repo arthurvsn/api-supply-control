@@ -19,6 +19,7 @@ Route::get('/user', 'UserController@index');
 Route::post('/register', 'UserController@store');
 Route::post('/login', 'UserController@login');
 
+Route::get('type-fuel', 'SupplyController@getTypeFuel');
 /**
  * Routes of change password
  */
@@ -53,6 +54,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
      * Routes of supply
      */
     Route::resource('supply', 'SupplyController');
+    
     Route::get('supply/{dateStart}/{dateEnd}/{carID}', 'SupplyController@expensesMounth');
 
 });

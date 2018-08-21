@@ -10,6 +10,11 @@ class TypeFuel extends Model
         'type'
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     /**
      * Table supplies relationship with type fuel
      */
