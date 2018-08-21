@@ -19,11 +19,13 @@ class CreateSuppliesTable extends Migration
             $table->decimal('liters', 5, 2);
             $table->decimal('amount', 5, 2);
             $table->double('fuel_price');
-            $table->enum('type', ['ALCOHOL', 'GASOLINE', 'DIESEL', 'GAS'])->default('GASOLINE');
             $table->date('date_supply');
 
             $table->integer('car_id')->unsigned();
             $table->foreign('car_id')->references('id')->on('cars');
+
+            $table->integer('type_fuel_id')->unsigned();
+            $table->foreign('type_fuel_id')->references('id')->on('type_fuels');
 
             $table->timestamps();
             $table->softDeletes();

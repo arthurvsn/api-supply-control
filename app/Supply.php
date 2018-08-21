@@ -31,6 +31,14 @@ class Supply extends Model
         return $this->belongsTo('App\Car');
     }
 
+    /**
+     * Table cars relationship with supplies
+     */
+    public function typeFuels()
+    {
+        return $this->belongsTo('App\TypeFuel');
+    }
+
     public function getExpenses($dateStart, $dateEnd, $carID)
     {
         $valueAmount = DB::table('supplies')

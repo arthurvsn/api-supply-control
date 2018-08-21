@@ -72,7 +72,7 @@ class Response
      * Function to converte a object with options
      * @return object $data
      */
-    public function toString()
+    public function toString2()
     {   
         $data = [];    
         $data['message']['text'] = $this->getMessages();
@@ -88,6 +88,41 @@ class Response
         }       
         
         return $data;        
+    }
+
+    /**
+     * Function to converte a object with options
+     * @return object $data
+     */
+    public function toString($type, $message = "")
+    {
+        $data = [];
+
+        if($message == "")
+        {
+            if($type == "S")
+            {
+                $message = "Successful request";
+            }
+            else
+            {
+                $message = "Error, could not complete your request";
+            }
+        }        
+
+        $data['message']['text'] = $message;
+        $data['message']['type'] = $type;
+
+        $dataset = $this->getDataset();
+        if (count($dataset) > 0 )
+        {
+            foreach ($dataset as $key => $value)
+            {
+                $data['dataset'][$key] = $value;
+            }
+        }
+        
+        return $data;
     }
 }
 ?>

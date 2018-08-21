@@ -8,10 +8,12 @@ use \App\Response\Response;
 
 class VerifyJWTToken
 {
+    private $messages;
     private $response;
 
     public function __construct() 
     {
+        $this->messages = \Config::get('messages');
         $this->response = new Response();
     }
 
@@ -41,21 +43,15 @@ class VerifyJWTToken
         {
             if($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) 
             {
-                $this->response->setType("N");
-                $this->response->setMessages("Token expired", $e->getStatusCode());
-                return response()->json($this->response->toString());
+                return response()->json($this->response->toString("N", $this->messages['token']['expired']));
             }
             else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) 
             {
-                $this->response->setType("N");
-                $this->response->setMessages("Token invalid", $e->getStatusCode());
-                return response()->json($this->response->toString());
+                return response()->json($this->response->toString("N", $this->messages['token']['invalid']));
             }
             else
             {
-                $this->response->setType("N");
-                $this->response->setMessages("Token is required");
-                return response()->json($this->response->toString());
+                return response()->json($this->response->toString("N", $this->messages['token']['riquered']));
             }
         }
        return $next($request);
