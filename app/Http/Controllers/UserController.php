@@ -124,7 +124,7 @@ class UserController extends Controller
         {
             \DB::beginTransaction();
 
-            $returnUser = $this->userService->createUser($request, $picutre['url']);
+            $returnUser = $this->userService->createUser($request);
 
             $returnUser->address = $this->userService->createAddressUser($returnUser->id, $request);
             $returnUser->phone = $this->userService->createPhoneUser($returnUser->id, $request);

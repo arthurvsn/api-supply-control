@@ -51,6 +51,7 @@ return [
     ],
 
     "user" => [
+        "create" => "User created sucessufuly",
         "delete" => "User and your dependencies deletede sucessfully!",
         "picture" => "Picture iserted",
         "save" => "Saved user successfully!",
