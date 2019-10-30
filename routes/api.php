@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -24,8 +22,11 @@ Route::get('type-fuel', 'SupplyController@getTypeFuel');
 /**
  * Routes of change password
  */
-Route::post('password/change', 'UserController@getTokenResetPassword');
-Route::post('password/reset/{token}', 'UserController@resetPassword');
+
+Route::group(['prefix' => 'password'], function () {
+    Route::post('change', 'UserController@getTokenResetPassword');
+    Route::post('reset/{token}', 'UserController@resetPassword');
+});
 
 /**
  * Rotas que precisam estar autenticadas
@@ -35,27 +36,33 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('/ping', 'UserController@ping');
 
     Route::get('getAuthUser', 'UserController@getUserLogged');
-    
-    Route::post('user/update/picture/{userID}', 'UserController@saveProfilePicture');
 
     /**
      * Routes of users
      */
     Route::resource('user', 'UserController', ['except' => [
         'store', 'index'
-    ]]); 
-
+    ]]);
+    
+    Route::group(['prefix' => 'user'], function () {
+        Route::post('update/picture/{userID}', 'UserController@saveProfilePicture');
+    });
     /**
      * Routes of cars
      */
     Route::resource('car', 'CarController');
-    Route::get('car/user/{userId}', 'CarController@getAllCarsByUser');
+
+    Route::group(['prefix' => 'car'], function () {
+        Route::get('user/{userId}', 'CarController@getAllCarsByUser');
+    });
 
     /**
      * Routes of supply
      */
     Route::resource('supply', 'SupplyController');
     
-    Route::get('supply/{dateStart}/{dateEnd}/{carID}', 'SupplyController@expensesMounth');
+    Route::group(['prefix' => 'supply'], function () {
+        Route::get('{dateStart}/{dateEnd}/{carID}', 'SupplyController@expensesMounth');
+    });
 
 });

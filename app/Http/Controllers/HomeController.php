@@ -10,7 +10,6 @@ use App\Test;
 class HomeController extends Controller
 {
     private $response;
-    private $messages;
 
     public function __construct() 
     {
