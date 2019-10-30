@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\FacadesDB;
-
-use App\User;
-use App\Car;
-use App\Response\Response;
-use App\Service\CarService;
 use Illuminate\Http\Request;
+use Illuminate\Support\DB;
+
+use Config;
+
+use App\Car;
+use App\User;
+
+use App\Response\Response;
+
+use App\Service\CarService;
 
 class CarController extends Controller
 {   
@@ -25,7 +29,7 @@ class CarController extends Controller
     {
         $this->car         = new Car();
         $this->carService  = new CarService();
-        $this->messages    = \Config::get('messages');
+        $this->messages    = Config::get('messages');
         $this->response    = new Response();
         $this->user        = new User();
     }
@@ -152,9 +156,9 @@ class CarController extends Controller
 
             DB::beginTransaction();
             
-            foreach($car as $key => $value) 
+            foreach($car as $data) 
             {
-                $cars = $this->car->find($value->id);
+                $cars = $this->car->find($data->id);
                 $cars->supplies()->delete();
             }
             

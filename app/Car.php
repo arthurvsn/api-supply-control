@@ -3,7 +3,6 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use DB;
 
 class Car extends Model
 {
@@ -29,7 +28,7 @@ class Car extends Model
      */
     public function users()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo(User::class);
     }
 
     /**
@@ -37,6 +36,6 @@ class Car extends Model
      */
     public function supplies()
     {
-        return $this->hasMany('App\Supply');
+        return $this->hasMany(Supply::class);
     }
 }
