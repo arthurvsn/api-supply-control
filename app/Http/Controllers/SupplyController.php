@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 
 use App\Supply;
 use App\TypeFuel;
-use \App\Service\SupplyService;
-use \App\Response\Response;
+use App\Service\SupplyService;
+use App\Response\Response;
 
 class SupplyController extends Controller
 {
@@ -20,7 +21,6 @@ class SupplyController extends Controller
      */
     public function __construct()
     {
-        $this->messages       = \Config::get('messages');
         $this->supply         = new Supply();
         $this->supplyService  = new SupplyService();
         $this->typeFuel       = new TypeFuel();
@@ -56,7 +56,7 @@ class SupplyController extends Controller
             $supplies = $this->supplyService->createSupply($request);
 
             $this->response->setDataSet('supply', $supplies);
-            return response()->json($this->response->toString("S", $this->messages['supply']['sucess']));
+            return response()->json($this->response->toString("S", config('supply.sucess')));
         }
         catch (\Exception $e)
         {
@@ -115,7 +115,7 @@ class SupplyController extends Controller
             $valueExpense = $this->supply->getExpenses($dateStart, $dateEnd, $carID);
 
             $this->response->setDataSet("supply", $valueExpense);
-            return response()->json($this->response->toString("S", $this->messages['supply']['search']));
+            return response()->json($this->response->toString("S", config('supply.search')));
     
         }
         catch (\Exception $e)
@@ -135,7 +135,7 @@ class SupplyController extends Controller
             $typeFuels = $this->typeFuel->get();
 
             $this->response->setDataSet("typeFuels", $typeFuels);
-            return response()->json($this->response->toString("S", $this->messages['supply']['search']));
+            return response()->json($this->response->toString("S", config('supply.search')));
 
         }
         catch (\Exception $e)

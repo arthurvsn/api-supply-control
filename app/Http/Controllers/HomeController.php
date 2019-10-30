@@ -14,13 +14,12 @@ class HomeController extends Controller
 
     public function __construct() 
     {
-        $this->messages = \Config::get('messages');
         $this->response = new Response();
     }
 
     public function index()
     {
-        return response()->json($this->response->toString("S", $this->messages['api']['connect']));
+        return response()->json($this->response->toString("S", config('api.connect')));
     }
 
     public function store(Request $request)

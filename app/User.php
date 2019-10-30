@@ -38,7 +38,7 @@ class User extends Authenticatable
      */
     public function addresses()
     {
-        return $this->hasMany('App\Address');
+        return $this->hasMany(Address::class);
     }
 
     /**
@@ -46,7 +46,7 @@ class User extends Authenticatable
      */
     public function phones()
     {
-        return $this->hasMany('App\Phone');
+        return $this->hasMany(Phone::class);
     }
 
     /**
@@ -54,6 +54,6 @@ class User extends Authenticatable
      */
     public function cars()
     {
-        return $this->hasMany('App\Car');
+        return $this->hasMany(Car::class);
     }
 }

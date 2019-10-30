@@ -20,6 +20,6 @@ class TypeFuel extends Model
      */
     public function supplies()
     {
-        return $this->hasMany('App\Supply');
+        return $this->hasMany(Supply::class);
     }
 }
