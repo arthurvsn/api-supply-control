@@ -28,7 +28,7 @@ class Supply extends Model
      */
     public function cars()
     {
-        return $this->belongsTo('App\Car');
+        return $this->belongsTo(Car::class);
     }
 
     /**
@@ -36,7 +36,7 @@ class Supply extends Model
      */
     public function typeFuels()
     {
-        return $this->belongsTo('App\TypeFuel');
+        return $this->belongsTo(TypeFuel::class);
     }
 
     public function getExpenses($dateStart, $dateEnd, $carID)

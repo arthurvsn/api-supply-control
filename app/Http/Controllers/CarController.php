@@ -65,7 +65,7 @@ class CarController extends Controller
             $returnCar = $this->carService->createCar($userLogged->id, $request);
 
             $this->response->setDataSet("Car", $returnCar);            
-            return response()->json($this->response->toString("S", $this->messages['car']['save']));
+            return response()->json($this->response->toString("S", config('car.save')));
         }
         catch (\Exception $e)
         {
@@ -85,12 +85,12 @@ class CarController extends Controller
 
         if(!$car)
         {
-            return response()->json($this->response->toString("N", $this->messages['error']));
+            return response()->json($this->response->toString("N", config('error')));
         }
         else 
         {
             $this->response->setDataSet("car", $car);
-            return response()->json($this->response->toString("S", $this->messages['car']['show']));
+            return response()->json($this->response->toString("S", config('car.show')));
         }
     }
 
@@ -118,7 +118,7 @@ class CarController extends Controller
             
             if(!$car) 
             {
-                return response()->json($this->response->toString("N", $this->messages['error']));
+                return response()->json($this->response->toString("N", config('error')));
             }
     
             $car->fill([
@@ -128,7 +128,7 @@ class CarController extends Controller
             $car->save();
 
             $this->response->setDataSet("car", $car);
-            return response()->json($this->response->toString("S", $this->messages['car']['save']));
+            return response()->json($this->response->toString("S", config('car.save')));
 
         }
         catch (\Exception $e)
@@ -151,7 +151,7 @@ class CarController extends Controller
             
             if(!$car)
             {
-                return response()->json($this->response->toString("N", $this->messages['error']));
+                return response()->json($this->response->toString("N", config('error')));
             }
 
             DB::beginTransaction();
@@ -163,7 +163,7 @@ class CarController extends Controller
             }
             
             DB::commit();
-            return response()->json($this->response->toString("S", $this->messages['car']['delete']));
+            return response()->json($this->response->toString("S", config('car.delete')));
 
         }
         catch (\Exception $e)
@@ -187,12 +187,12 @@ class CarController extends Controller
 
             if(!$cars)
             {
-                return response()->json($this->response->toString("N", $this->messages['error']));
+                return response()->json($this->response->toString("N", config('error')));
             }
             else 
             {
                 $this->response->setDataSet("cars", $cars);
-                return response()->json($this->response->toString("S", $this->messages['car']['show']));
+                return response()->json($this->response->toString("S", config('car.show')));
             }            
         }
         catch (\Exception $e)
