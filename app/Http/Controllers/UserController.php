@@ -3,18 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
 use JWTAuth;
 use JWTAuthException;
-use Validator;
 use Mail;
+
 use App\User;
 use App\Address;
 use App\Phone;
 use App\Car;
 use App\Supply;
-use \App\Response\Response;
-use \App\Service\UserService;
-use \App\Service\CloudinaryService;
+use App\Response\Response;
+use App\Service\UserService;
+use App\Service\CloudinaryService;
 
 class UserController extends Controller
 {
@@ -36,7 +37,6 @@ class UserController extends Controller
         $this->address      = new Address;
         $this->car          = new Car;
         $this->cloudinary   = new CloudinaryService();
-        $this->messages     = \Config::get('messages');
         $this->phone        = new Phone;
         $this->response     = new Response();
         $this->supply       = new Supply;
@@ -57,7 +57,7 @@ class UserController extends Controller
         {
            if (!$token = JWTAuth::attempt($credentials)) 
            {
-               return response()->json($this->response->toString("N", $this->messages['login']['credentials']));
+               return response()->json($this->response->toString("N", config('login.credentials')));
            }
 
             $user = JWTAuth::toUser($token);
@@ -65,7 +65,7 @@ class UserController extends Controller
             $this->response->setDataSet("token", $token);
             $this->response->setDataSet("user", $user);
 
-            return response()->json($this->response->toString("S", $this->messages['login']['sucess']));
+            return response()->json($this->response->toString("S", config('login.sucess')));
         } 
         catch (JWTAuthException $e) 
         {
@@ -83,7 +83,7 @@ class UserController extends Controller
         $users = User::get();
         
         $this->response->setDataSet("user", $users);
-        return response()->json($this->response->toString("S", $this->messages['user']['show']));
+        return response()->json($this->response->toString("S", config('user.show')));
     }
 
     /**
@@ -95,12 +95,12 @@ class UserController extends Controller
 
         if(!$user_logged) 
         {
-            return response()->json($this->response->toString("N", $this->messages['error']));
+            return response()->json($this->response->toString("N", config('error')));
         } 
         else 
         {
             $this->response->setDataSet("user", $user_logged);
-            return response()->json($this->response->toString("S", $this->messages['login']['logged']));
+            return response()->json($this->response->toString("S", config('login.logged')));
         }
 
     }
@@ -122,20 +122,20 @@ class UserController extends Controller
     {
         try
         {
-            \DB::beginTransaction();
+            DB::beginTransaction();
 
             $returnUser = $this->userService->createUser($request);
 
             $returnUser->address = $this->userService->createAddressUser($returnUser->id, $request);
             $returnUser->phone = $this->userService->createPhoneUser($returnUser->id, $request);
             
-            \DB::commit();
+            DB::commit();
             $this->response->setDataSet("user", $returnUser);            
-            return response()->json($this->response->toString("S", $this->messages['user']['create']));
+            return response()->json($this->response->toString("S", config('user.create')));
         }
         catch (\Exception $e)
         {
-            \DB::rollBack();
+            DB::rollBack();
             return response()->json($this->response->toString("N", $e->getMessage()));
         }
     }
@@ -152,28 +152,27 @@ class UserController extends Controller
 
         if(!$user)
         {            
-            return response()->json($this->response->toString("N", $this->messages['error']));
+            return response()->json($this->response->toString("N", config('error')));
         }
-        else 
-        {
-            $user->addresses = $user->addresses()->get();
-            $user->phones = $user->phones()->get();
-            $car = $user->cars()->get();
 
-            $objectCar = [];
-            foreach ($car as $key => $value) 
-            {                
-                $carValue = $this->car->find($value->id);
-                $supply = $carValue->supplies()->get();
-                $carValue->supply = $carValue->supplies()->get();
-                $objectCar[] = $carValue;
-            }
+        $user->addresses = $user->addresses()->get();
+        $user->phones = $user->phones()->get();
+        $car = $user->cars()->get();
 
-            $user->cars = $objectCar;
-            
-            $this->response->setDataSet("user", $user);
-            return response()->json($this->response->toString("S", $this->messages['user']['show']));
+        $objectCar = [];
+        foreach ($car as $key => $value) 
+        {                
+            $carValue = $this->car->find($value->id);
+            $supply = $carValue->supplies()->get();
+            $carValue->supply = $carValue->supplies()->get();
+            $objectCar[] = $carValue;
         }
+
+        $user->cars = $objectCar;
+        
+        $this->response->setDataSet("user", $user);
+        return response()->json($this->response->toString("S", config('user.show')));
+
     }
 
     /**
@@ -200,13 +199,14 @@ class UserController extends Controller
             
             if(!$user) 
             {
-                return response()->json($this->response->toString("N", $this->messages['error']));
+                return response()->json($this->response->toString("N", config('error')));
             }
 
             /**
              * Ainda é gambiarra, organizar isso
              */
-            \DB::beginTransaction();            
+            DB::beginTransaction();   
+         
             $user->fill([
                 $request->all(),
                 'password' => bcrypt($request->get('password')),
@@ -222,12 +222,12 @@ class UserController extends Controller
              * Fim da Gambiarra
              */
             
-            \DB::commit();
-            return response()->json($this->response->toString("S", $this->messages['user']['save']));
+            DB::commit();
+            return response()->json($this->response->toString("S", config('user.save')));
         }
         catch (\Exception $e)
         {
-            \DB::rollBack();
+            DB::rollBack();
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
@@ -245,12 +245,12 @@ class UserController extends Controller
     {
         try
         {
-            \DB::beginTransaction();
+            DB::beginTransaction();
             $user = User::find($id);
 
             if(!$user) 
             {
-                return response()->json($this->response->toString("N", $this->messages['error']));
+                return response()->json($this->response->toString("N", config('error')));
             }
 
             $car = $user->cars()->get();
@@ -258,9 +258,9 @@ class UserController extends Controller
             /**
              * Delete all supply dependencies of a user's cars
              */
-            foreach($car as $key => $value) 
+            foreach($car as $data) 
             {
-                $cars = $this->car->find($value->id);
+                $cars = $this->car->find($data->id);
                 $cars->supplies()->delete();
             }
             
@@ -272,13 +272,13 @@ class UserController extends Controller
             $user->phones()->delete();
             $user->delete();
 
-            \DB::commit();
-            return response()->json($this->response->toString("S", $this->messages['user']['delete']));
+            DB::commit();
+            return response()->json($this->response->toString("S", config('user.delete')));
 
         }
         catch (\Exception $e)
         {
-            \DB::rollBack();
+            DB::rollBack();
             return response()->json($this->response->toString("N", $e->getMessage()));
         }
     }
@@ -294,7 +294,7 @@ class UserController extends Controller
         {
             $user = $this->userService->getAuthUser($resquest);
 
-            return response()->json($this->response->toString("S", $this->messages['login']['logged']));
+            return response()->json($this->response->toString("S", config('login.logged')));
         }
         catch (\Exception $e)
         {
@@ -315,7 +315,7 @@ class UserController extends Controller
 
             if (!$user)
             {
-                return response()->json($this->response->toString("N", $this->messages['reset']['nomail']));
+                return response()->json($this->response->toString("N", config('reset.nomail')));
             }
 
             $userToken = JWTAuth::fromUser($user);
@@ -333,7 +333,7 @@ class UserController extends Controller
 
             });
 
-            return response()->json($this->response->toString("N", $this->messages['reset']['sucess']));
+            return response()->json($this->response->toString("N", config('reset.sucess')));
 
         }
         catch (\Exception $e)
@@ -356,7 +356,7 @@ class UserController extends Controller
 
             if (!$token)
             {
-                return response()->json($this->response->toString("N", $this->messages['login']['invalid']));
+                return response()->json($this->response->toString("N", config('login.invalid')));
             }
 
             $user = $this->user->find($userToken->id);
@@ -371,7 +371,7 @@ class UserController extends Controller
             //JWTAuth::setToken($token)->invalidate();
             JWTAuth::invalidate($token);
 
-            return response()->json($this->response->toString("S", $this->messages['login']['change']));
+            return response()->json($this->response->toString("S", config('login.change')));
         }
         catch (\Exception $e)
         {
@@ -394,7 +394,7 @@ class UserController extends Controller
 
             if (!$picutre || !$user)
             {
-                return response()->json($this->response->toString("N", $this->messages['error']));
+                return response()->json($this->response->toString("N", config('error')));
             }
 
             $user->fill([
@@ -404,7 +404,7 @@ class UserController extends Controller
             $user->save();
 
             $this->response->setDataSet("picture", $picutre);
-            return response()->json($this->response->toString("S", $this->messages['user']['picture']));
+            return response()->json($this->response->toString("S", config('user.picture')));
         }
 
         catch (\Exception $e)
