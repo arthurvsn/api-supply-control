@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use JWTAuth;
-use JWTAuthException;
+use Illuminate\Support\FacadesDB;
+
 use App\User;
 use App\Car;
-use \App\Response\Response;
-use \App\Service\CarService;
+use App\Response\Response;
+use App\Service\CarService;
 use Illuminate\Http\Request;
 
 class CarController extends Controller
@@ -57,11 +57,6 @@ class CarController extends Controller
         try
         {
             $userLogged = $this->carService->getAuthUser($request);
-
-            if(!$userLogged)
-            {
-                return response()->json($this->response->toString("N", $this->messages['login']['unauthenticated']));
-            }
 
             $returnCar = $this->carService->createCar($userLogged->id, $request);
 
@@ -155,23 +150,21 @@ class CarController extends Controller
                 return response()->json($this->response->toString("N", $this->messages['error']));
             }
 
-            \DB::beginTransaction();
+            DB::beginTransaction();
             
             foreach($car as $key => $value) 
             {
                 $cars = $this->car->find($value->id);
                 $cars->supplies()->delete();
             }
-
-            $user->delete();
             
-            \DB::commit();
+            DB::commit();
             return response()->json($this->response->toString("S", $this->messages['car']['delete']));
 
         }
         catch (\Exception $e)
         {
-            \DB::rollBack();
+            DB::rollBack();
             return response()->json($this->response->toString("N", $e->getMessage()));
         }
     }
